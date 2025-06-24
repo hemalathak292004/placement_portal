@@ -59,12 +59,6 @@ const handleCollegeSignUP = asyncHandler(async (req, res, next) => {
       throw new Error('College Staff Already Exists!')
     } else {
       let hashedPass = await bcrypt.hash(password, 10)
-      // const updatedCollege = { ...data , personalDetail : { password : hashedPass , ...personalDetail} }
-
-      // storing all docuuments of students and companies
-      const students = await Student.find()
-      const companies = await Company.find()
-      // console.log(students);
 
       const collegeStaffAccount = await CollegeStaff.create({
         personalDetail: {
@@ -75,11 +69,10 @@ const handleCollegeSignUP = asyncHandler(async (req, res, next) => {
           password: hashedPass,
           staffID
         },
-        studentDetails: students,
-        companyDetails: companies
+        studentDetails: [],
+        companyDetails: []
       })
 
-      // console.log(collegeStaffAccount);
       if (collegeStaffAccount) {
         const usrTyp = 'college-staff'
         const token = generateToken(collegeStaffAccount._id.toString(), usrTyp)
@@ -87,16 +80,12 @@ const handleCollegeSignUP = asyncHandler(async (req, res, next) => {
         res.cookie('token', token, {
           path: '/',
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400), // 1 day
-          sameSite: 'none',
-          secure: true
+          expires: new Date(Date.now() + 1000 * 86400) // 1 day
         })
         res.cookie('userType', usrTyp, {
           path: '/',
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400), // 1 day
-          sameSite: 'none',
-          secure: true
+          expires: new Date(Date.now() + 1000 * 86400) // 1 day
         })
         res.status(201).json({ message: 'Account created Successfully' })
       } else {
@@ -134,17 +123,13 @@ const handleCollegeSignIN = asyncHandler(async (req, res) => {
         res.cookie('token', token, {
           path: '/',
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400), // 1 day
-          sameSite: 'none',
-          secure: true
+          expires: new Date(Date.now() + 1000 * 86400) // 1 day
         })
 
         res.cookie('userType', usrTyp, {
           path: '/',
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400), // 1 day
-          sameSite: 'none',
-          secure: true
+          expires: new Date(Date.now() + 1000 * 86400) // 1 day
         })
         res.status(201).json({ message: 'Login Successfull' })
       } else {
@@ -165,16 +150,12 @@ const handleCollegeSignOUT = asyncHandler(async (req, res) => {
     res.cookie('token', '', {
       path: '/',
       httpOnly: true,
-      expires: new Date(0), // 1 day
-      sameSite: 'none',
-      secure: true
+      expires: new Date(0) // 1 day
     })
     res.cookie('userType', '', {
       path: '/',
       httpOnly: true,
-      expires: new Date(0), // 1 day
-      sameSite: 'none',
-      secure: true
+      expires: new Date(0) // 1 day
     })
     res.status(201).json({ message: 'Signed out successfully' })
   } catch (error) {

@@ -14,8 +14,6 @@ const handleCompanySignUP = asyncHandler(async (req, res, next) => {
     const { emailID, firstName, lastName, phone, password, cpass, staffID } =
       personalDetail
 
-    console.log(req.body)
-
     if (
       !emailID ||
       !password ||
@@ -43,7 +41,6 @@ const handleCompanySignUP = asyncHandler(async (req, res, next) => {
       )
     }
 
-    const college = await CollegeStaff.find()
     const existingCompany = await Company.findOne({
       $or: [
         { 'personalDetail.emailID': emailID },
@@ -56,55 +53,36 @@ const handleCompanySignUP = asyncHandler(async (req, res, next) => {
     if (existingCompany) {
       res.status(409)
       throw new Error('Company Already Exists!')
-    } else if (college.length === 0) {
-      throw new Error('Internal Server Error')
     } else {
       let hashedPass = await bcrypt.hash(password, 10)
-      // const updatedCollege = { ...data , personalDetail : { password : hashedPass , ...personalDetail} }
       const pass = hashedPass
 
-      const students = await Student.find()
-      // console.log(students);
-      let companyAccount
-      if (students) {
-        // console.log(students);
-
-        companyAccount = await Company.create({
-          personalDetail: {
-            emailID,
-            firstName,
-            lastName,
-            phone,
-            password: pass,
-            staffID
-          },
-          company: company,
-          studentDetails: students
-        })
-      }
+      const companyAccount = await Company.create({
+        personalDetail: {
+          emailID,
+          firstName,
+          lastName,
+          phone,
+          password: pass,
+          staffID
+        },
+        company: company,
+        studentDetails: []
+      })
 
       if (companyAccount) {
-        const companyID = new mongoose.Types.ObjectId(companyAccount.id)
-        const settingCompanyIdInCollege = await CollegeStaff.updateMany({
-          $push: { companyDetails: companyID }
-        })
-
         const usrTyp = 'company'
         const token = generateToken(companyAccount._id.toString(), usrTyp)
 
         res.cookie('token', token, {
           path: '/',
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400), // 1 day
-          sameSite: 'none',
-          secure: true
+          expires: new Date(Date.now() + 1000 * 86400) // 1 day
         })
         res.cookie('userType', usrTyp, {
           path: '/',
           httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400), // 1 day
-          sameSite: 'none',
-          secure: true
+          expires: new Date(Date.now() + 1000 * 86400) // 1 day
         })
         res.status(201).json({ message: 'Account created Successfully' })
       } else {
@@ -113,7 +91,6 @@ const handleCompanySignUP = asyncHandler(async (req, res, next) => {
       }
     }
   } catch (error) {
-    // console.log("error" , error);
     next(error)
   }
 })

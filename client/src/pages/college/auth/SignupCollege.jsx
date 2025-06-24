@@ -8,7 +8,9 @@ import {
   collegeStaffSignUp,
   RESET,
 } from "../../../redux/features/college/auth/authSlice";
+import { SET_GLOBAL } from "../../../redux/features/common/globalSlice";
 import CommonSignupForm from "../../../components/CommonSignupForm";
+
 const SignupCollege = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -16,38 +18,37 @@ const SignupCollege = () => {
   const { isLoading, isLoggedIn, isError, isSuccess, message } = useSelector(
     (state) => state.collegeStaffAuth
   );
-  function handleCollegeStaffSignUp(data) {
-    // console.log(data);
-    dispatch(collegeStaffSignUp(data));
 
-    dispatch(RESET());
+  function handleCollegeStaffSignUp(data) {
+    dispatch(collegeStaffSignUp(data));
   }
 
   useEffect(() => {
     if (isLoggedIn && isSuccess) {
-      // navigate('/college-staff')
+      // Set global auth state before navigation
+      dispatch(SET_GLOBAL("college-staff"));
+      navigate('/college-staff/dashboard');
     }
 
-    if (
-      isSuccess &&
-      !isLoggedIn &&
-      message === "College Staff Already Exists!"
-    ) {
-      toast.info("Please,SignIn ", {
+    if (isSuccess && !isLoggedIn && message === "College Staff Already Exists!") {
+      toast.info("Please Sign In", {
         position: toast.POSITION.TOP_RIGHT,
       });
       navigate("/signin/college-staff");
     }
 
-    dispatch(RESET());
-  }, [isSuccess, isLoggedIn]);
+    // Only reset if we have a success or error state
+    if (isSuccess || isError) {
+      dispatch(RESET());
+    }
+  }, [isSuccess, isLoggedIn, isError, message, navigate, dispatch]);
 
-return (
+  return (
     <CommonSignupForm 
-    isLoading={isLoading}
-    signupHeading={"College Signup"}
-    userType={"college-staff"}
-    onSignupFormSubmitHandler={handleCollegeStaffSignUp}
+      isLoading={isLoading}
+      signupHeading={"College Signup"}
+      userType={"college-staff"}
+      onSignupFormSubmitHandler={handleCollegeStaffSignUp}
     />
   );
 };

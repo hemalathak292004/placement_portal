@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { signup, RESET } from "../../../redux/features/student/auth/authSlice";
+import { SET_GLOBAL } from "../../../redux/features/common/globalSlice";
 import CommonSignupForm from "../../../components/CommonSignupForm";
 
 function SignUpStudent() {
@@ -18,12 +19,14 @@ function SignUpStudent() {
   const handleStudentStaffSignUp = async (data) => {
     dispatch(signup(data));
   };
+  
   useEffect(() => {
     if (isLoggedIn && isSuccess) {
+      dispatch(SET_GLOBAL("student")); // Set global auth state
       toast.success(message, {
         position: toast.POSITION.TOP_RIGHT,
       });
-      navigate("/student");
+      navigate("/student/profile");
     } else if (isError) {
       toast.warning(message, {
         position: toast.POSITION.TOP_RIGHT,

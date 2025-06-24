@@ -94,12 +94,13 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="/college-staff" element={<CollegeDashboard />}>
+        <Route path="/college-staff/" element={<CollegeStaffProfile />} />
         <Route
-          path="/college-staff/profile"
+          path="/college-staff/dashboard"
           element={<CollegeStaffProfile />}
         />
         <Route
-          path="/college-staff/"
+          path="/college-staff/profile"
           element={<CollegeStaffProfile />}
         />
         <Route path="/college-staff/students" element={<StudentsToCollege />} />
@@ -122,6 +123,8 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="/company" element={<CompanyDashboard />}>
+        <Route path="/company/" element={<CompanyProfile />} />
+        <Route path="/company/dashboard" element={<CompanyProfile />} />
         <Route path="/company/profile" element={<CompanyProfile />} />
         <Route path="/company/students" element={<StudentsToCompamy />} />
         <Route
@@ -134,7 +137,6 @@ const router = createBrowserRouter(
           path="/company/applicantDetails/:id"
           element={<ApplicantsDetails />}
         />
-
         <Route path="/company/postJobs" element={<PostJobs />} />
         <Route
           path="/company/resetPassword"

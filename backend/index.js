@@ -16,22 +16,30 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
+// Update CORS configuration for development
 app.use(
   cors({
+    origin: 'http://localhost:3000',
     credentials: true,
-    origin: process.env.FRONTEND_URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Origin',
+      'Accept',
+      'X-Requested-With'
+    ],
+    exposedHeaders: ['Set-Cookie']
   })
 )
 app.use(express.urlencoded({ extended: false }))
 
 // DataBase Connection
-const dbURL = `mongodb+srv://amartripathi:${DATABASE_PASS}@cluster0.2kwytrq.mongodb.net/database`
+const dbURL = `mongodb+srv://hemalatha:20@cluster0.alzmfte.mongodb.net/placementportal?retryWrites=true&w=majority&appName=Cluster0`
 connectToMongoDB(dbURL)
   .then(() => {
     console.log('DB Connected')
-    app.listen(PORT, () =>
-      console.log('server started at ', PORT || 5000)
-    )
+    app.listen(PORT, () => console.log('server started at ', PORT || 5000))
   })
   .catch(() => console.log('DB Connection Failed'))
 
@@ -40,39 +48,47 @@ app.get(
   '/',
   asyncHandler(async (req, res, next) => {
     try {
-      const token = req.cookies.token;
-      const userType = req.cookies.userType;
-      
+      const token = req.cookies.token
+      const userType = req.cookies.userType
+
       if (!token && !userType) {
-        return res.status(200).json({ message: 'visitor' });
+        return res.status(200).json({ message: 'visitor' })
       }
 
       if (token && userType) {
-        let isVerified;
+        let isVerified
         if (userType === 'student') {
-          isVerified = jwt.verify(token, process.env.JWT_SECRET_KEY_STUDENT);
+          isVerified = jwt.verify(token, process.env.JWT_SECRET_KEY_STUDENT)
         } else if (userType === 'college-staff') {
-          isVerified = jwt.verify(token, process.env.JWT_SECRET_KEY_COLLEGE);
+          isVerified = jwt.verify(token, process.env.JWT_SECRET_KEY_COLLEGE)
         } else if (userType === 'company') {
-          isVerified = jwt.verify(token, process.env.JWT_SECRET_KEY_COMPANY);
+          isVerified = jwt.verify(token, process.env.JWT_SECRET_KEY_COMPANY)
         } else {
-          return res.status(401).json({ message: 'Unauthorized Access! Please signin again.' });
+          return res
+            .status(401)
+            .json({ message: 'Unauthorized Access! Please signin again.' })
         }
 
         if (isVerified) {
-          return res.status(200).json({ message: userType });
+          return res.status(200).json({ message: userType })
         } else {
-          return res.status(401).json({ message: 'Unauthorized Access! Please signin again.' });
+          return res
+            .status(401)
+            .json({ message: 'Unauthorized Access! Please signin again.' })
         }
       } else {
-        return res.status(400).json({ message: 'Bad Request: Missing token or userType.' });
+        return res
+          .status(400)
+          .json({ message: 'Bad Request: Missing token or userType.' })
       }
     } catch (error) {
       if (error.message === 'invalid token') {
-        return res.status(401).json({ message: 'Session Expired! Please SignIn again.' });
+        return res
+          .status(401)
+          .json({ message: 'Session Expired! Please SignIn again.' })
       } else {
-        console.log(error);
-        next(error);
+        console.log(error)
+        next(error)
       }
     }
   })

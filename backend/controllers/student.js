@@ -45,93 +45,58 @@ const handleStudentSignUP = asyncHandler(async (req, res, next) => {
       ]
     })
 
-    // fetch store all college, company account for furthur use
-    const company = await Company.find()
-    const college = await CollegeStaff.find()
-
     // if student exists then
     if (existingStudent) {
       res.status(409)
       throw new Error('Student Already Exists!')
-    } else if (company.length === 0 || college === 0) {
-      /*check if company, college document is [] or not , since we want to create student account only if we have 
-    college , company account in our db */
-      throw new Error('Internal Server Error')
     }
 
-    // if college , company account(s) are present and also if this is a fresh signup then
-    else {
-      //hash the given password
-      const hashedPass = await bcrypt.hash(password, 10)
+    //hash the given password
+    const hashedPass = await bcrypt.hash(password, 10)
 
-      // create new student account with credentials and hash password
-      let student = await Student.create({
-        personalDetail: {
-          emailID,
-          firstName,
-          lastName,
-          phone,
-          password: hashedPass
-        }
-      })
-
-      // store the studentID of above created student
-      const studentID = new mongoose.Types.ObjectId(student.id)
-
-      // console.log(studentID); //for debug purpose
-
-      //store the id of student in all companies and colleges
-      const settingStudentIdInCollege = await CollegeStaff.updateMany({
-        $push: { studentDetails: studentID }
-      })
-      const settingStudentIdInCompany = await Company.updateMany({
-        $push: { studentDetails: studentID }
-      })
-      // console.log(settingStudentIdInCollege);  //for debug purpose
-
-      if (
-        student &&
-        settingStudentIdInCollege.modifiedCount >= 1 &&
-        settingStudentIdInCompany.modifiedCount >= 1
-      ) {
-        // if above condition met then populate the college and company with student details
-        const populatedCollegeStaff = await CollegeStaff.find({}).populate({
-          path: 'studentDetails',
-          select: '-personalDetail.password'
-        })
-        const populatedCompany = await Company.find({}).populate({
-          path: 'studentDetails',
-          select: '-personalDetail.password'
-        })
-
-        // generate token using above created student's student id
-        const usrTyp = 'student'
-        const token = generateToken(student._id.toString(), usrTyp)
-
-        // console.log(token); //for debug
-
-        // since student account is created now save userType and token in cookie
-        res.cookie('token', token, {
-          path: '/',
-          httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400), // 1 day
-          sameSite: 'none',
-          secure: true
-        })
-        res.cookie('userType', usrTyp, {
-          path: '/',
-          httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 86400), // 1 day
-          sameSite: 'none',
-          secure: true
-        })
-
-        res.status(201).json({ message: 'Account Created Successfully' })
-      } else {
-        res.status(403)
-        throw new Error('Invalid user data')
+    // create new student account with credentials and hash password
+    let student = await Student.create({
+      personalDetail: {
+        emailID,
+        firstName,
+        lastName,
+        phone,
+        password: hashedPass
       }
+    })
+
+    // store the studentID of above created student
+    const studentID = new mongoose.Types.ObjectId(student.id)
+
+    // Try to update colleges and companies if they exist
+    try {
+      await CollegeStaff.updateMany({
+        $push: { studentDetails: studentID }
+      })
+      await Company.updateMany({
+        $push: { studentDetails: studentID }
+      })
+    } catch (error) {
+      console.log('No colleges or companies found to update')
     }
+
+    // generate token using above created student's student id
+    const usrTyp = 'student'
+    const token = generateToken(student._id.toString(), usrTyp)
+
+    // since student account is created now save userType and token in cookie
+    res.cookie('token', token, {
+      path: '/',
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400) // 1 day
+    })
+    res.cookie('userType', usrTyp, {
+      path: '/',
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400) // 1 day
+    })
+
+    res.status(201).json({ message: 'Account Created Successfully' })
   } catch (error) {
     next(error)
   }
@@ -199,16 +164,12 @@ const handleStudentSignOUT = asyncHandler(async (req, res) => {
     res.cookie('token', '', {
       path: '/',
       httpOnly: true,
-      expires: new Date(0), // 1 day
-      sameSite: 'none',
-      secure: true
+      expires: new Date(0) // 1 day
     })
     res.cookie('userType', '', {
       path: '/',
       httpOnly: true,
-      expires: new Date(0), // 1 day
-      sameSite: 'none',
-      secure: true
+      expires: new Date(0) // 1 day
     })
     res.status(201).json({ message: 'signout successfull' })
   } catch (error) {

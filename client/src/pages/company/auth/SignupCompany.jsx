@@ -7,6 +7,7 @@ import {
   RESET,
   companyStaffSignUp,
 } from "../../../redux/features/company/auth/authSlice";
+import { SET_GLOBAL } from "../../../redux/features/common/globalSlice";
 import CommonSignupForm from "../../../components/CommonSignupForm";
 
 const SignupCompany = () => {
@@ -16,10 +17,9 @@ const SignupCompany = () => {
   const { isLoading, isLoggedIn, isError, isSuccess, message } = useSelector(
     (state) => state.companyAuth
   );
+
   function handleCompanyStaffSignUp(data) {
-    const { cpass, emailID, firstName, lastName, password, phone, staffID } =
-      data;
-    // console.log(data);
+    const { cpass, emailID, firstName, lastName, password, phone, staffID } = data;
     dispatch(
       companyStaffSignUp({
         personalDetail: {
@@ -34,31 +34,34 @@ const SignupCompany = () => {
         company: data.company,
       })
     );
-
-    dispatch(RESET());
   }
 
   useEffect(() => {
     if (isLoggedIn && isSuccess) {
-      navigate("/company");
+      // Set global auth state before navigation
+      dispatch(SET_GLOBAL("company"));
+      navigate("/company/");
     }
 
     if (isSuccess && !isLoggedIn && message === "Company Already Exists!") {
-      navigate("/signin/company");
-      toast.info("Please,Sigin", {
+      toast.info("Please Sign In", {
         position: toast.POSITION.TOP_RIGHT,
       });
+      navigate("/signin/company");
     }
 
-    dispatch(RESET());
-  }, [isSuccess, isLoggedIn]);
+    // Only reset if we have a success or error state
+    if (isSuccess || isError) {
+      dispatch(RESET());
+    }
+  }, [isSuccess, isLoggedIn, isError, message, navigate, dispatch]);
 
   return (
     <CommonSignupForm
-    isLoading={isLoading}
-    signupHeading={"Company Signup"}
-    userType={"company"}
-    onSignupFormSubmitHandler={handleCompanyStaffSignUp}
+      isLoading={isLoading}
+      signupHeading={"Company Signup"}
+      userType={"company"}
+      onSignupFormSubmitHandler={handleCompanyStaffSignUp}
     />
   );
 };

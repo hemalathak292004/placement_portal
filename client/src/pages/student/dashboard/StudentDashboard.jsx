@@ -27,11 +27,13 @@ function StudentDashboard() {
       globalAuth.isSuccess &&
       globalAuth.userType !== "student"
     ) {
-      toast.error("Unauthorized Access! Please SignIn", {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      navigate("/signin");
-      dispatch(RESET_GLOBAL)
+      if (!isLoggedIn) {
+        toast.error("Unauthorized Access! Please SignIn", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        navigate("/signin");
+      }
+      dispatch(RESET_GLOBAL);
     } else {
       dispatch(getLoginStatus());
     }

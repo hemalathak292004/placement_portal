@@ -2,13 +2,22 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = "http://localhost:5000";
+
+// Configure axios defaults
+axios.defaults.withCredentials = true;
 
 export const getLoginStatus = createAsyncThunk(
   "getLoginStatus",
   async (_, thunkAPI) => {
     try {
-      const response = await axios.get(BACKEND_URL);
+      const response = await axios.get(BACKEND_URL, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       const message =
@@ -44,6 +53,7 @@ export const globalSlice = createSlice({
       state.userType = action.payload;
       state.isLoading = false;
       state.isLoggedin = true;
+      state.isSuccess = true;
     },
   },
   extraReducers: (builder) => {
@@ -63,11 +73,8 @@ export const globalSlice = createSlice({
         state.isLoggedin = false;
         state.isLoading = false;
         state.isSuccess = true;
-        state.message = action.payload;        
-        if (
-          action.payload !==
-          "Request failed with status code 400"
-        ) {
+        state.message = action.payload;
+        if (action.payload !== "Request failed with status code 400") {
           toast.error(`${action.payload}`, {
             position: toast.POSITION.TOP_CENTER,
           });

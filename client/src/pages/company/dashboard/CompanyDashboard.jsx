@@ -102,12 +102,8 @@ const CompanyDashboard = () => {
             firstName={company?.personalDetail.firstName}
             lastName={company?.personalDetail.lastName}
             profileImgLink={company?.personalDetail.profilePicture}
-          >
-            {companySidebarItems.map(item => 
-               (
-                <SidebarItem key={item.label} text={item.label} icon={item.icon} active  />
-              ))}
-          </Sidemenu>
+            sidebarItems={companySidebarItems}
+          />
 
         <div
            className={`flex flex-col  absolute  overflow-x-hidden right-0 top-0 min-h-screen 
