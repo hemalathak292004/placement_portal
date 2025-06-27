@@ -14,7 +14,11 @@
   },
   "name": "backend",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
@@ -23,7 +27,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "prettier": "^3.3.3"
   }
