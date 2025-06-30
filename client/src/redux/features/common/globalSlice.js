@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
-
-const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+import { BACKEND_URL } from "../../../config";
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;

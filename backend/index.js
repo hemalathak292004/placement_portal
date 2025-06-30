@@ -19,7 +19,10 @@ app.use(cookieParser())
 // Update CORS configuration for development
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'https://placement-portal-1-m4yz.onrender.com'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: [

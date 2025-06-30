@@ -1,8 +1,7 @@
 import axios from "axios";
+import { API_ENDPOINTS } from "../../../../config";
 
-const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
-const API_URL = `${BACKEND_URL}/company/`;
+const API_URL = API_ENDPOINTS.COMPANY;
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;

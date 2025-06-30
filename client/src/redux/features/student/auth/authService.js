@@ -1,8 +1,7 @@
 import axios from "axios";
+import { API_ENDPOINTS } from "../../../../config";
 
-const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
-const API_URL = `${BACKEND_URL}/student/`;
+const API_URL = API_ENDPOINTS.STUDENT;
 
 // Configure axios defaults for all requests
 const axiosInstance = axios.create({
