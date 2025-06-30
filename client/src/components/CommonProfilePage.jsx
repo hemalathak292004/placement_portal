@@ -3,7 +3,7 @@ import PurpleBackground from "./containers/PurpleBackground";
 import LoadingPage from "../pages/LoadingPage";
 import SlateBackground from "./containers/SlateBackground";
 import WhiteBackground from "./containers/WhiteBackground";
-import AccountStatus from "./AccountStatus";
+import AccountStatus from "./sidemenu/AccountStatus";
 import FormField from "./containers/FormField";
 import InputWithEdit from "./inputField/InputWithEdit";
 import {

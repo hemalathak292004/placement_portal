@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfileDetail } from "../../../../redux/features/student/auth/authSlice";
-import AccountStatus from "../../../../components/AccountStatus";
+import AccountStatus from "../../../../components/sidemenu/AccountStatus";
 import FormField from "../../../../components/containers/FormField";
 import Label from "../../../../components/label";
 import {
